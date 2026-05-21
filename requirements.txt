@@ -1,0 +1,28 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+
+# RAG / Vector DB
+langchain-chroma
+sentence-transformers
+langchain-text-splitters
+langchain
+langchain-community
+
+# Memory
+SQLAlchemy
+
+# LLM provider
+langchain-openai
+openai
+
+# Document processing
+pypdf
+
+# Utilities
+python-dotenv
+
+# Streamlit frontend
+streamlit
+requests
