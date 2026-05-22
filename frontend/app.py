@@ -1,9 +1,10 @@
 import streamlit as st
 import requests
 import uuid
+import os
 
-# ─── CONFIG ───────────────────────────────────────────
-API_BASE = "http://localhost:8000/api"
+# CONFIG 
+API_URL = os.getenv("API_URL", "http://localhost:8000/api")
 HEALTH_URL = "http://localhost:8000/health"
 
 st.set_page_config(
@@ -12,7 +13,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# ─── SESSION STATE INIT ───────────────────────────────
+# SESSION STATE INIT
 def init_session_state():
     """Initialize all session state variables safely."""
     defaults = {
@@ -46,7 +47,7 @@ with st.sidebar:
         st.session_state.current_chat_name = f"Chat {len(st.session_state.chat_sessions) + 1}"
         st.rerun()
     
-    # ─── PREVIOUS CHATS LIST ──────────────────────────
+    # PREVIOUS CHATS LIST 
     if st.session_state.chat_sessions:
         st.divider()
         st.caption("Previous chats")
@@ -68,7 +69,7 @@ with st.sidebar:
     
     st.divider()
     
-    # ─── DOCUMENT UPLOAD ──────────────────────────────
+    # DOCUMENT UPLOAD
     st.header("📁 Upload Documents")
     
     uploaded = st.file_uploader(
@@ -90,7 +91,7 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"❌ {e}")
     
-    # ─── HEALTH STATUS ────────────────────────────────
+    # HEALTH STATUS
     st.divider()
     try:
         health = requests.get(HEALTH_URL, timeout=3).json()
@@ -101,7 +102,7 @@ with st.sidebar:
     except:
         st.error("🔴 Offline")
 
-# ─── MAIN CHAT AREA ──────────────────────────────────
+# MAIN CHAT AREA
 st.title("🏦 Banking Support Chatbot")
 st.caption("Ask about loans, credit cards, policies & FAQs")
 
@@ -118,7 +119,7 @@ for msg in st.session_state.messages:
                     st.markdown(f"**{src['source']}** ({src['doc_type']})")
                     st.caption(src["content"])
 
-# ─── CHAT INPUT ──────────────────────────────────────
+# CHAT INPUT
 if prompt := st.chat_input("Ask about banking..."):
     # Add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
