@@ -18,5 +18,5 @@ def similarity_search(query: str, k: int = None, filter_dict: dict = None):
     if not vectorstore:
         return []
     
-    k = k or settings.TOP_K
+    k = settings.TOP_K
     return vectorstore.similarity_search(query, k=k, filter=filter_dict)

@@ -1,7 +1,8 @@
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from backend.config import settings
 
-async def load_documents(directory: str = None):
+def load_documents(directory: str = None):
+    """Load PDF documents from directory (sync)."""
     data_path = directory or settings.DATA_PATH
     
     loader = DirectoryLoader(
@@ -10,6 +11,6 @@ async def load_documents(directory: str = None):
         loader_cls=PyPDFLoader,
         show_progress=True
     )
-    docs = await loader.aload()
+    docs = loader.load()
     
     return docs

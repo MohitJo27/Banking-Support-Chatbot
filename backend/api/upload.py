@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from backend.config import settings
 from backend.rag.loader import load_documents
@@ -9,8 +10,8 @@ from backend.rag.vectorstore import get_vectorstore, create_vectorstore, add_doc
 router = APIRouter()
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    allowed_extensions = {".pdf", ".txt", ".docx"}
+def upload_file(file: UploadFile = File(...)):
+    allowed_extensions = {".pdf", ".txt"}
     file_ext = os.path.splitext(file.filename)[1].lower()
     
     if file_ext not in allowed_extensions:
@@ -23,7 +24,10 @@ async def upload_file(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, f)
     
     try:
-        docs = await load_documents(settings.DATA_PATH)
+        docs = load_documents(settings.DATA_PATH)
+        if not docs:
+            raise Exception("No documents loaded - check if PDF is readable")
+        
         chunks = split_documents(docs)
         
         vectorstore = get_vectorstore()
@@ -40,4 +44,6 @@ async def upload_file(file: UploadFile = File(...)):
             "message": msg
         }
     except Exception as e:
-        raise HTTPException(500, f"Indexing failed: {str(e)}")
+        error_detail = f"{str(e)}\n\n{traceback.format_exc()}"
+        print(error_detail)
+        raise HTTPException(500, detail=error_detail)

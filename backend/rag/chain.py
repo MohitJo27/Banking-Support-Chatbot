@@ -2,7 +2,7 @@ from langchain_openai import ChatOpenAI
 from langchain_classic.chains import ConversationalRetrievalChain
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.prompts import PromptTemplate 
+from langchain_core.prompts import PromptTemplate
 from backend.config import settings
 from backend.rag.retriever import get_retriever
 
@@ -18,7 +18,7 @@ Current Question: {question}
 
 Answer:"""
 
-PROMPT = PromptTemplate (
+PROMPT = PromptTemplate(
     input_variables=["context", "chat_history", "question"],
     template=CUSTOM_PROMPT
 )
@@ -30,7 +30,6 @@ def get_session_history(session_id: str):
     )
 
 def get_chat_chain():
-    """Mandatory: Non-streaming chain for POST /chat."""
     retriever = get_retriever()
     if not retriever:
         return None
@@ -46,35 +45,6 @@ def get_chat_chain():
         retriever=retriever,
         combine_docs_chain_kwargs={"prompt": PROMPT},
         return_source_documents=True,
-        verbose=False
-    )
-    
-    return RunnableWithMessageHistory(
-        chain,
-        get_session_history,
-        input_messages_key="question",
-        history_messages_key="chat_history",
-        output_messages_key="answer"
-    )
-
-def get_streaming_chain():
-    """Bonus: Streaming chain for POST /chat/stream."""
-    retriever = get_retriever()
-    if not retriever:
-        return None
-    
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
-        openai_api_key=settings.OPENAI_API_KEY,
-        temperature=0.2,
-        streaming=True
-    )
-    
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        combine_docs_chain_kwargs={"prompt": PROMPT},
-        return_source_documents=False,
         verbose=False
     )
     
